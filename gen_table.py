@@ -1,6 +1,8 @@
 
 from typing import List, Dict, Sequence, Optional, TypedDict, Union, Set
 
+import sys
+from pathlib import Path
 from collections import defaultdict
 
 import argparse
@@ -239,8 +241,29 @@ def get_table_from_config(cfg: Union[str, Config]) -> str:
     return get_table(data=data, max_lens=max_lens, aligns=aligns)
 
 
+#region CLI
+
+parser = argparse.ArgumentParser(
+    prog=f"{str(Path(__file__).name)}",
+    description=(
+        'Script for creating markdown tables using json config'
+    ),
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+
+parser.add_argument('CONFIG_FILE', type=str, help='json file with the configuration')
+
+#endregion
 
 
+if __name__ == '__main__':
+
+    parsed = parser.parse_args(sys.argv[1:])
+
+    res = get_table_from_config(
+        cfg=parsed.CONFIG_FILE,
+    )
+    print(res)
 
 
 
