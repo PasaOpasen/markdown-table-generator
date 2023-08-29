@@ -1,5 +1,7 @@
 
-from typing import List, Dict, Sequence, Optional
+from typing import List, Dict, Sequence, Optional, TypedDict, Union, Set
+
+from collections import defaultdict
 
 import argparse
 
@@ -157,6 +159,94 @@ def get_table(
         for i in range(rows_count)
     ]
     return '\n'.join(strings)
+
+
+class Column(TypedDict):
+    label: Optional[str]
+    """short column label to use in rows dicts"""
+    max_len: int
+    align: str
+
+
+class Config(TypedDict):
+    columns: Dict[str, Column]
+    order: Optional[List[str]]
+    rows: List[Dict[str, str]]
+
+
+def get_table_from_config(cfg: Union[str, Config]) -> str:
+    """
+
+    Args:
+        cfg: config or path to it
+
+    Returns:
+
+    >>> print(get_table_from_config('./config.json'))
+    | Data<br />in<br />the<br />colu<br />mn 2 | Data in<br />the column<br />1 |
+    | :--- | ---: |
+    | data<br />for<br />colu<br />mn 2 | data for<br />column 1 |
+    | next<br />row | next row |
+
+    """
+
+    if isinstance(cfg, str):
+        import json
+        with open(cfg, 'r', encoding='utf-8') as f:
+            cfg: Config = json.load(f)
+
+    all_colums: Set[str] = set()
+    name2label: Dict[str, str] = {}
+    max_lens: Dict[str, int] = {}
+    aligns: Dict[str, str] = {}
+
+    def put(column_name: str, column_meta: Column, meta_key: str, target_dict: Dict):
+        _v = column_meta.get(meta_key)
+        if _v:
+            if column_name in target_dict:
+                raise ValueError(f"{column_name} column already exist in {target_dict}")
+            target_dict[column_name] = _v
+
+    for name, meta in cfg['columns'].items():
+        all_colums.add(name)
+        put(name, meta, 'label', name2label)
+        put(name, meta, 'max_len', max_lens)
+        put(name, meta, 'align', aligns)
+
+    label2name = {v: k for k, v in name2label.items()}
+
+    def to_column_name(s: str) -> str:
+        if s in label2name:
+            return label2name[s]
+        return s
+
+    order = [to_column_name(c) for c in (cfg.get('order') or [])]
+
+    data: Dict[str, List[str]] = defaultdict(list)
+
+    for row in cfg['rows']:
+        for k, v in row.items():
+            k = to_column_name(k)
+            assert k in all_colums, f"{k} is not listed in columns fields, available columns are {all_colums}"
+            data[k].append(v)
+
+    if order:
+        assert sorted(order) == sorted(all_colums), (set(order) - all_colums, all_colums - set(order))
+        data = {
+            k: data[k] for k in order
+        }
+
+    return get_table(data=data, max_lens=max_lens, aligns=aligns)
+
+
+
+
+
+
+
+
+
+
 
 
 
