@@ -176,7 +176,9 @@ class Config(TypedDict):
     rows: List[Dict[str, str]]
 
 
-def get_table_from_config(cfg: Union[str, Config]) -> str:
+def get_table_from_config(
+    cfg: Union[str, Config]
+) -> str:
     """
 
     Args:
@@ -227,10 +229,15 @@ def get_table_from_config(cfg: Union[str, Config]) -> str:
     data: Dict[str, List[str]] = defaultdict(list)
 
     for row in cfg['rows']:
+        row_keys = set()
         for k, v in row.items():
             k = to_column_name(k)
             assert k in all_colums, f"{k} is not listed in columns fields, available columns are {all_colums}"
             data[k].append(v)
+            row_keys.add(k)
+        unmentioned_keys = set(data.keys()) - row_keys
+        for k in unmentioned_keys:
+            data[k].append('')
 
     if order:
         assert sorted(order) == sorted(all_colums), (set(order) - all_colums, all_colums - set(order))

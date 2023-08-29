@@ -3,12 +3,12 @@
         "Data in the column 1": {
             "label": "1",
             "align": "right",
-            "max_len": 10
+            "max_len": 15
         },
         "Data in the column 2": {
             "label": "2",
             "align": "left",
-            "max_len": 4
+            "max_len": 10
         }
     },
     "order": ["2", "1"],
@@ -20,6 +20,9 @@
         {
             "1": "next row",
             "2": "next row"
+        },
+        {
+            "2": "will use empty values for unmentioned keys"
         }
     ]
 }
