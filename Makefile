@@ -21,10 +21,10 @@ else
 endif
 
 help:
-	$(PYTHON) gen-table.py --help
+	$(PYTHON) gen_table.py --help
 
 doctest:
-	$(PYTHON) -m pytest --doctest-modules gen-table.py
+	$(PYTHON) -m pytest --doctest-modules gen_table.py
 
 t: doctest
 
