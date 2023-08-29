@@ -95,7 +95,8 @@ _aligns = {
 def get_table(
     data: Dict[str, Sequence[str]],
     max_lens: Optional[Dict[str, int]] = None,
-    aligns: Optional[Dict[str, str]] = None
+    aligns: Optional[Dict[str, str]] = None,
+    default_align: str = 'center'
 ) -> str:
     """
     generates markdown table depends on data and params
@@ -103,6 +104,7 @@ def get_table(
         data:
         max_lens:
         aligns:
+        default_align:
 
     Returns:
 
@@ -144,7 +146,7 @@ def get_table(
     columns = {
         k: [
             split_text_to_markdown_lines(k, max_lens.get(k, 0)),
-            _aligns[aligns.get(k, 'left')]
+            _aligns[aligns.get(k, default_align)]
         ] + [split_text_to_markdown_lines(v, max_lens.get(k, 0)) for v in rows]
         for k, rows in data.items()
     }
