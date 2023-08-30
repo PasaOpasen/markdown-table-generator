@@ -235,7 +235,7 @@ def get_table_from_config(
             assert k in all_colums, f"{k} is not listed in columns fields, available columns are {all_colums}"
             data[k].append(v)
             row_keys.add(k)
-        unmentioned_keys = set(data.keys()) - row_keys
+        unmentioned_keys = all_colums - row_keys
         for k in unmentioned_keys:
             data[k].append('')
 
